@@ -50,8 +50,8 @@ class ReflectionControllerTest extends AbstractIntegrationTest {
                         .content("{\"text\":\"요즘 자꾸 죽고싶다는 생각이 들어\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.riskDetected").value(true))
-                .andExpect(jsonPath("$.riskResources.length()").value(2))
-                .andExpect(jsonPath("$.riskResources[0].phone").value("0199"));
+                .andExpect(jsonPath("$.riskResources.length()").value(3))
+                .andExpect(jsonPath("$.riskResources[0].phone").value("109"));
     }
 
     @Test

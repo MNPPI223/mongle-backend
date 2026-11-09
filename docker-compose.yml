@@ -5,6 +5,12 @@
 #   backend   이 레포를 빌드한 Spring Boot 서버. Flyway가 스키마를 만든다. 호스트 포트 8081.
 #             GEMINI_API_KEY는 .env에서 읽는다 — 없으면 reflections는 전부 폴백 문구로 응답한다
 #             (에러는 아니다. API_명세서_v1 4.3 참고).
+#
+# name을 명시한 이유: Docker Compose는 기본적으로 디렉터리 이름으로 프로젝트명을 정한다.
+# 이 레포도 "backend" 폴더라서, 같은 이름(Backend)을 쓰는 다른 프로젝트(Coffeul)와 컨테이너·
+# 볼륨 이름이 겹쳐 그쪽 MySQL 볼륨을 그대로 재사용해버리는 사고가 실제로 났었다(2026-11-09,
+# 계정 'mongle' 비밀번호가 안 맞는다는 에러로 발견). name을 고정해서 이 사고를 막는다.
+name: mongle-backend
 
 services:
   mysql:

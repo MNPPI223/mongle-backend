@@ -12,8 +12,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class RiskKeywordDetector {
 
+    // 2026-11-09 웹서치로 재확인함(README "안심콜 번호 재확인 필요" 항목 해소). 디자인 프로토타입의
+    // "0199"는 1577-0199의 뒷자리만 딴 불완전한 번호였다. 보건복지부 기준 현재(2024.1.1~) 자살예방
+    // 상담전화는 109(3자리 통합번호)이고, 1577-0199는 109로 흡수되지 않고 "정신건강 위기상담전화"로
+    // 계속 별도 운영 중(전국 공통, 24시간, 129로도 연결). 둘 다 성격이 달라서 함께 안내한다.
     private static final List<RiskResource> RESOURCES = List.of(
-            new RiskResource("자살예방상담전화(안심콜)", "0199"),
+            new RiskResource("자살예방상담전화", "109"),
+            new RiskResource("정신건강 위기상담전화", "1577-0199"),
             new RiskResource("긴급신고", "119")
     );
 

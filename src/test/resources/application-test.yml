@@ -23,7 +23,7 @@ mongle:
   reflections:
     max-per-session: 20
   risk:
-    keywords: 자살,죽고싶,죽어버리,자해,손목,칼로,사라지고싶,때렸,폭행,맞았,스토킹,미행,찾아올까봐,협박,죽인다,죽일거야
+    keywords: 자살,죽고싶,죽어버리,자해,자해하고,손목,칼로,사라지고싶,목매,번개탄,투신,극단적 선택,때렸,폭행,맞았,맞고,스토킹,미행,쫓아온다,따라온다,찾아올까봐,협박,죽인다,죽일거야
   memory:
     soft-limit: 30
     preview-ttl-minutes: 30

@@ -21,7 +21,13 @@ public class RiskKeywordDetector {
 
     public RiskKeywordDetector(
             @Value("#{'${mongle.risk.keywords}'.split(',')}") List<String> keywords) {
-        this.keywords = keywords.stream().map(String::trim).filter(k -> !k.isBlank()).toList();
+        // matches()가 입력 텍스트의 공백을 전부 제거하고 비교하므로, "극단적 선택"처럼 공백이
+        // 든 키워드를 yml에 그대로 적으면 조용히 매칭이 안 된다(2026-11-09 실제 curl 검증 중
+        // 발견). 키워드 쪽도 똑같이 공백을 제거해서 이 클래스 안에서 규칙이 항상 일관되게 한다.
+        this.keywords = keywords.stream()
+                .map(k -> k.trim().replaceAll("\\s+", ""))
+                .filter(k -> !k.isBlank())
+                .toList();
     }
 
     public boolean matches(String text) {

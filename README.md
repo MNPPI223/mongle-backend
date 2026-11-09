@@ -62,8 +62,9 @@ reflection/  — POST /sessions/{id}/reflections, Gemini 연동        } 백엔�
 
 ## 아직 안 끝난 것 (명세서 9장 + 이번 세팅에서 추가로 발견한 것)
 
-- **GEMINI_API_KEY 발급** — 계정/결제 주체를 팀이 정해야 함. 키 없이도 서버는 정상 동작(폴백)하니 당장 블로커는 아니다.
-- **위험 키워드 리스트** — `application.yml`의 `mongle.risk.keywords` (쉼표 구분, 코드 재배포 없이 값만 바꿔도 됨). 지금은 15개 초안, 팀 검수 필요.
+- ~~실 MySQL 검증~~ → **완료 (2026-11-09)**: `docker compose up -d --build backend`로 MySQL 8.4 컨테이너 위에서 Flyway 마이그레이션·Hibernate 스키마 검증·전 엔드포인트(auth→sessions→reflections→memories/preview)를 curl로 직접 확인함. H2가 아니라 실제 MySQL에서도 깨끗하게 돈다.
+- **GEMINI_API_KEY 발급** — 계정/결제 주체를 팀이 정해야 함. 키 없이도 서버는 정상 동작(폴백)하니 당장 블로커는 아니다. **키가 생기기 전까진 `SYSTEM_INSTRUCTION` 프롬프트 튜닝도 보류** — 실제 모델 응답 없이 프롬프트를 고치는 건 추측이라 의미가 없다.
+- **위험 키워드 리스트** — `application.yml`의 `mongle.risk.keywords`. 16개 초안에서 흔한 동의어·활용형(목매·번개탄·투신·극단적 선택·맞고·쫓아온다·따라온다 등) 8개를 보강해 24개로 늘림(2026-11-09). **보강 과정에서 실제 버그 하나 발견·수정함**: `RiskKeywordDetector`가 입력 텍스트는 공백을 지우고 비교하면서 키워드 쪽은 안 지워서, `"극단적 선택"`처럼 공백 든 키워드가 조용히 매칭 안 되고 있었다(키워드 쪽도 공백 제거하도록 수정, curl로 재검증 완료). 여전히 팀 검수 필요한 초안.
 - **배포 환경** — 로컬 데모만 할지, 결선용으로 어딘가에 띄울지 아직 결정 안 됨. `Dockerfile`은 만들어뒀으니 정해지면 바로 올릴 수 있다.
 - **단일 인스턴스 가정** — `SessionContextStore`(대화 컨텍스트, rate limit)가 서버 메모리에만 있다. 여러 대로 스케일 아웃하는 순간 이 클래스부터 Redis 등으로 바꿔야 한다.
 

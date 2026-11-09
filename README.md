@@ -32,8 +32,11 @@ Docker 없이 전부 컨테이너로 올리고 싶으면 `docker compose up --bu
 
 **4. 테스트.**
 ```bash
-./mvnw test   # Docker 없이 H2로 돈다. 17개 전부 통과하는 게 기준.
+./mvnw test   # Docker가 떠 있어야 한다 — Testcontainers가 실제 MySQL 8.4를 자동으로 띄운다.
+              # H2는 더 이상 안 쓴다(한 번 스키마 타입 차이로 사고 났었음, 아래 표 참고).
+              # 17개 전부 통과하는 게 기준. 첫 실행은 mysql:8.4 이미지를 받느라 좀 걸릴 수 있다.
 ```
+CI(GitHub Actions)도 똑같이 Testcontainers로 돈다 — `ubuntu-latest` 러너엔 Docker가 기본으로 떠 있어서 별도 설정이 필요 없다. 즉 **로컬에서 통과하면 CI에서도 똑같이 통과한다**(둘 다 H2가 아니라 같은 실제 MySQL이라서).
 
 ## 모듈 = 작업 분담 (API_명세서_v1 8장 그대로)
 
@@ -54,13 +57,14 @@ reflection/  — POST /sessions/{id}/reflections, Gemini 연동        } 백엔�
 
 | 명세서 내용 | 실제 구현 | 왜 |
 |---|---|---|
-| ERD의 `CHAR(36)` | `VARCHAR(36)`로 변경 | H2(테스트)가 Hibernate 기본 매핑과 CHAR를 다른 타입으로 봐서 스키마 검증이 깨짐. UUID엔 실질적 차이 없음 |
+| ERD의 `CHAR(36)` | `VARCHAR(36)`로 변경 | 원래는 H2(테스트)가 Hibernate 기본 매핑과 CHAR를 다른 타입으로 봐서 스키마 검증이 깨졌던 것 — 지금은 테스트도 실제 MySQL(Testcontainers)이라 이 문제 자체가 없어졌지만, 되돌릴 이유도 없어서 VARCHAR로 유지. UUID엔 실질적 차이 없음 |
 | "Gemini 실패 시 폴백 + `riskDetected:false`" | 폴백 문구는 그대로, `riskDetected`는 **키워드 판정 결과를 유지** | 위험 키워드는 Gemini 호출 *전에* 판정된다. 업스트림이 죽었다고 위험 신호까지 숨기면 위기 상황에서 더 위험해진다. `ReflectionControllerTest`에 이 케이스 테스트 있음 |
 | 500 에러 코드 `AI_UPSTREAM_ERROR` 하나 | `AI_UPSTREAM_ERROR`(Gemini 실패 전용) + `INTERNAL_ERROR`(그 외 예상 못 한 500) 분리 | reflections는 Gemini가 죽어도 500을 사용자에게 보여주지 않으므로, `AI_UPSTREAM_ERROR`가 실제로 클라이언트에 나가는 일은 정상 흐름에선 없다. 둘을 분리해야 로그에서 "진짜 버그"와 "AI 업스트림 이슈"를 구분할 수 있다 |
 | "프론트엔드 스택 미정" (9장 블로커) | 백엔드가 몰라도 되게 설계 | 인증이 쿠키가 아니라 Bearer 토큰이라 CORS는 `ALLOWED_ORIGINS` 환경변수 하나로만 열면 된다. 웹이든 네이티브 앱이든 백엔드 코드는 안 바뀐다 |
 | 서버 포트 | 8081 | 이 Mac에 Coffeul 등 다른 프로젝트가 로컬 8080을 쓰고 있어서 겹치지 않게 뗐다 |
 | Gemini 타임아웃 "3초 기준" | `8000ms`로 변경 | 2026-11-09 실제 키로 5회 호출해보니 전부 4.7~5.1초 걸림 — 3초면 **매번** 폴백으로 떨어져서 사실상 AI를 안 쓰는 것과 같았다. 실측 기반으로 올림 |
 | 위기 응답 톤 | `SYSTEM_INSTRUCTION`에 "전화번호·기관명 직접 언급 금지" 규칙 추가 | 2026-11-09 실제 키로 위험 키워드 케이스 테스트하다가, Gemini가 자유 텍스트 응답 안에 `riskResources`(0199)와 다른 번호(1393)를 스스로 지어내는 걸 발견함. 정확한 연락처는 구조화된 `riskResources` 필드가 전담하게 하고, 모델 응답은 번호를 아예 언급 못 하게 막음(재검증 3회 완료) |
+| 테스트 DB "Docker 없이 H2" | **Testcontainers로 실제 MySQL 8.4**로 전환 | 2026-11-09, 성준님 합류 전에 CI 자동검증을 강화하기로 함 — H2와 실제 MySQL의 스키마 차이로 이미 한 번 사고(위 CHAR/VARCHAR 건)가 났던 전례가 있어서, 아예 테스트도 운영과 같은 DB로 통일. 로컬·CI 둘 다 Docker가 필요해졌다는 게 트레이드오프 |
 
 ## 아직 안 끝난 것 (명세서 9장 + 이번 세팅에서 추가로 발견한 것)
 

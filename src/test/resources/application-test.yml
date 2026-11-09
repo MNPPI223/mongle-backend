@@ -1,9 +1,6 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:mongle;MODE=MySQL;DB_CLOSE_DELAY=-1
-    username: sa
-    password: ""
-    driver-class-name: org.h2.Driver
+  # datasource는 AbstractIntegrationTest가 @DynamicPropertySource로 Testcontainers MySQL
+  # 주소를 넣어준다 — 여기엔 안 적는다.
   jpa:
     hibernate:
       ddl-auto: validate
@@ -19,7 +16,7 @@ mongle:
     api-key: ""
     model: gemini-3.5-flash
     base-url: https://generativelanguage.googleapis.com/v1beta
-    timeout-ms: 3000
+    timeout-ms: 8000
   reflections:
     max-per-session: 20
   risk:

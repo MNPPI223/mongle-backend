@@ -5,14 +5,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongle.backend.support.AbstractIntegrationTest;
 import com.mongle.backend.support.AuthTestSupport;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
@@ -20,11 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
  * 폴백 경로를 탄다. 그래도 검증할 수 있는 게 있다: 폴백 상황에서도 위험 키워드 판정
  * (riskDetected)은 죽지 않아야 한다는, 이 서비스에서 제일 중요한 안전 규칙.
  */
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
 @Import(AuthTestSupport.class)
-class ReflectionControllerTest {
+class ReflectionControllerTest extends AbstractIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;

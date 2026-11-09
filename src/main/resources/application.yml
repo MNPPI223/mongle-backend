@@ -31,7 +31,9 @@ mongle:
     api-key: ${GEMINI_API_KEY:}
     model: gemini-3.5-flash
     base-url: https://generativelanguage.googleapis.com/v1beta
-    timeout-ms: 3000
+    # 2026-11-09 실측: 실제 키로 5회 호출, 전부 4.7~5.1초. 명세서 원안의 "3초 기준"은 전부
+    # 폴백으로 떨어지는 값이라 의미가 없었음 — 8초로 올려서 여유를 둔다.
+    timeout-ms: 8000
   reflections:
     max-per-session: 20
   risk:

@@ -11,7 +11,7 @@ public class GeminiProperties {
     private String apiKey = "";
     private String model = "gemini-3.5-flash";
     private String baseUrl = "https://generativelanguage.googleapis.com/v1beta";
-    private int timeoutMs = 3000;
+    private int timeoutMs = 8000; // 실측 근거는 application.yml의 mongle.gemini.timeout-ms 주석 참고
 
     public String getApiKey() { return apiKey; }
     public void setApiKey(String apiKey) { this.apiKey = apiKey; }
